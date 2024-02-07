@@ -9,6 +9,10 @@ var appLogger = hclog.New(&hclog.LoggerOptions{
     Level: hclog.LevelFromString("DEBUG"),
 });
 
+func Initialize(level string) {
+  appLogger.SetLevel(hclog.LevelFromString("DEBUG"))
+}
+
 func Named(name string) hclog.Logger {
     return appLogger.Named(name)
 }

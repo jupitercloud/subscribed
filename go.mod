@@ -3,6 +3,7 @@ module jupitercloud.com/subscribed
 go 1.21.5
 
 require (
+	github.com/alecthomas/kong v0.8.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
