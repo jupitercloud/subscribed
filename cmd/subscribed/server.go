@@ -4,14 +4,21 @@
 package main
 
 import (
-    "net/http"
+	"context"
+	"net/http"
 
-    "github.com/gorilla/mux"
-    "github.com/gorilla/rpc"
-    "github.com/gorilla/rpc/json"
-    "go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
-    "jupitercloud.com/subscribed/service"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/rpc"
+	"github.com/gorilla/rpc/json"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+	"jupitercloud.com/subscribed/service"
 )
+
+var tracer = otel.Tracer("server")
 
 func CorsHandler(response http.ResponseWriter, request *http.Request) {
     log.Debug("OPTIONS /rpc")
@@ -29,6 +36,39 @@ func corsMiddleware(next http.Handler) http.Handler {
     })
 }
 
+func httpTraceMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
+        span := trace.SpanFromContext(request.Context())
+        if span.IsRecording() {
+            span.SetAttributes(
+                attribute.String("http.request.header.content-type", request.Header.Get("Content-Type")),
+            )
+        }
+        next.ServeHTTP(response, request)
+    })
+}
+
+func rpcHookBefore(info *rpc.RequestInfo) *http.Request {
+    ctx1, span := tracer.Start(info.Request.Context(), "RPC " + info.Method)
+    ctx2 := context.WithValue(ctx1, "rpcSpan", span)
+    span.SetAttributes(
+        attribute.String("rpc.system", "json_rpc"),
+        attribute.String("rpc.method", info.Method),
+    )
+    if info.Error == nil {
+        span.SetStatus(codes.Ok, codes.Ok.String())
+    } else {
+        span.SetStatus(codes.Error, info.Error.Error())
+    }
+    req := info.Request.WithContext(ctx2)
+    return req
+}
+
+func rpcHookAfter(info *rpc.RequestInfo) {
+    span := info.Request.Context().Value("rpcSpan").(trace.Span)
+    span.End()
+}
+
 func (cmd *ServerCmd) Run() error {
     log.Info("Launching SubscribeD", "address", cmd.Address)
 
@@ -38,9 +78,12 @@ func (cmd *ServerCmd) Run() error {
     s.RegisterCodec(json.NewCodec(), "application/json")
     // Register the service by creating a new JSON server
     s.RegisterService(new(service.SubscriptionService), "")
+    s.RegisterInterceptFunc(rpcHookBefore)
+    s.RegisterAfterFunc(rpcHookAfter)
 
     r := mux.NewRouter()
     r.Use(otelmux.Middleware("subscribed"))
+    r.Use(httpTraceMiddleware)
     r.Use(corsMiddleware)
     r.HandleFunc("/rpc", CorsHandler).Methods("OPTIONS")
     r.Handle("/rpc", s)
