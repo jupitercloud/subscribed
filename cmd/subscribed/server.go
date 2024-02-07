@@ -9,6 +9,7 @@ import (
     "github.com/gorilla/mux"
     "github.com/gorilla/rpc"
     "github.com/gorilla/rpc/json"
+    "go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
     "jupitercloud.com/subscribed/service"
 )
 
@@ -39,6 +40,7 @@ func (cmd *ServerCmd) Run() error {
     s.RegisterService(new(service.SubscriptionService), "")
 
     r := mux.NewRouter()
+    r.Use(otelmux.Middleware("subscribed"))
     r.Use(corsMiddleware)
     r.HandleFunc("/rpc", CorsHandler).Methods("OPTIONS")
     r.Handle("/rpc", s)
