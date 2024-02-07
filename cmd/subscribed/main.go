@@ -4,6 +4,7 @@
 package main
 
 import (
+    "context"
     "net/http"
     "os"
 
@@ -13,12 +14,14 @@ import (
     "github.com/gorilla/rpc/json"
     "jupitercloud.com/subscribed/logger"
     "jupitercloud.com/subscribed/service"
+    "jupitercloud.com/subscribed/telemetry"
 )
 
 var log = logger.Named("main");
 
 type Globals struct {
     LogLevel string `enum:"debug,info,warn,error" default:"info"`
+    Telemetry string `enum:"console,grpc,none" default:"none"`
 }
 
 type ServerCmd struct {
@@ -69,20 +72,34 @@ func (cmd *ServerCmd) Run() error {
    	return nil
 }
 
+func exit(err error) {
+    log.Error("Fatal error", "error", err)
+    os.Exit(1)
+}
+
 func main() {
     // This program uses Kong to parse the CLI
     // See https://danielms.site/zet/2023/kong-is-an-amazing-cli-for-go-apps/
-
     cli := CLI{
         Globals: Globals{
             LogLevel: "INFO",
+            Telemetry: "none",
         },
     }
     ctx := kong.Parse(&cli)
     logger.Initialize(cli.Globals.LogLevel)
-    err := ctx.Run()
+   	// Set up OpenTelemetry.
+	shutdownTelemetry, err := telemetry.Initialize(context.Background(), telemetry.ExportModeFromString(cli.Globals.Telemetry))
+	if err != nil {
+		exit(err)
+	}
+    // Shutdown telemetry on exit.
+	defer func() {
+        shutdownTelemetry(context.Background())
+	}()
+
+    err = ctx.Run()
     if (err != nil) {
-        log.Error("Fatal error", "error", err)
-        os.Exit(1)
+        exit(err)
     }
 }
