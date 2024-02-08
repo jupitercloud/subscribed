@@ -9,8 +9,8 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/rpc"
-	"github.com/gorilla/rpc/json"
+	rpc "github.com/gorilla/rpc/v2"
+	"github.com/gorilla/rpc/v2/json2"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -77,7 +77,7 @@ func (cmd *ServerCmd) Run(quit chan os.Signal) error {
     // Create a new RPC server
     s := rpc.NewServer()
     // Register the type of data requested as JSON
-    s.RegisterCodec(json.NewCodec(), "application/json")
+    s.RegisterCodec(json2.NewCodec(), "application/json")
     // Register the service by creating a new JSON server
     s.RegisterService(new(service.SubscriptionService), "")
     s.RegisterInterceptFunc(rpcHookBefore)
