@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -23,6 +24,7 @@ type Claims struct {
 type authService struct {
     issuer string
     vendorId string
+    devMode bool
     provider *oidc.Provider
     verifier *oidc.IDTokenVerifier
 }
@@ -40,6 +42,26 @@ func (auth *authService) readToken(ctx context.Context, tokenString string) *Cla
         return &claims
     }
     err = token.Claims(&claims)
+    if err != nil {
+        claims.Error = errors.JwtError(err)
+        return &claims
+    }
+    if claims.VendorId != auth.vendorId {
+        claims.Error = errors.InvalidVendorIdClaim()
+        return &claims
+    }
+    return &claims
+}
+
+func (auth *authService) readDevToken(tokenString string) *Claims {
+    log.Debug("Reading dev token", "token", tokenString)
+    // In development mode, the Authorization claims are parsed as raw JSON string.
+    var claims Claims
+    if (tokenString == "") {
+        claims.Error = errors.Unauthenticated()
+        return &claims
+    }
+    err := json.Unmarshal([]byte(tokenString), &claims)
     if err != nil {
         claims.Error = errors.JwtError(err)
         return &claims
@@ -74,13 +96,19 @@ func (auth *authService) Shutdown(ctx context.Context) error {
 func (auth *authService) Middleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
         ctx := request.Context()
-        claims := auth.readToken(ctx, request.Header.Get("Authorization"))
+        token := request.Header.Get("Authorization")
+        var claims *Claims
+        if auth.devMode {
+            claims = auth.readDevToken(token)
+        } else {
+            claims = auth.readToken(ctx, token)
+        }
         ctx2 := context.WithValue(ctx, "claims", claims)
         request2 := request.WithContext(ctx2)
         next.ServeHTTP(response, request2)
     })
 }
 
-func NewAuthService(issuer string, vendorId string) *authService {
-    return &authService{issuer: issuer, vendorId: vendorId}
+func NewAuthService(issuer string, vendorId string, devMode bool) *authService {
+    return &authService{issuer: issuer, vendorId: vendorId, devMode: devMode}
 }
