@@ -72,8 +72,6 @@ func rpcHookAfter(info *rpc.RequestInfo) {
 }
 
 func (cmd *ServerCmd) Run(quit chan os.Signal) error {
-    log.Info("Launching SubscribeD", "address", cmd.Address)
-
     // Create a new RPC server
     s := rpc.NewServer()
     // Register the type of data requested as JSON
@@ -107,6 +105,7 @@ func (cmd *ServerCmd) Run(quit chan os.Signal) error {
         server.Shutdown(context.Background())
     }()
 
+    log.Info("Launching SubscribeD", "address", cmd.Address)
     err = server.ListenAndServe()
     if (err != nil && err != http.ErrServerClosed ) {
       log.Error("Failed to launch server", "error", err)
