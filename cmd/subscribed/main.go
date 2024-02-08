@@ -1,12 +1,14 @@
 package main
 
 import (
-    "context"
-    "os"
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
 
-    "github.com/alecthomas/kong"
-    "jupitercloud.com/subscribed/logger"
-    "jupitercloud.com/subscribed/telemetry"
+	"github.com/alecthomas/kong"
+	"jupitercloud.com/subscribed/logger"
+	"jupitercloud.com/subscribed/telemetry"
 )
 
 var log = logger.Named("main");
@@ -52,7 +54,9 @@ func main() {
         shutdownTelemetry(context.Background())
 	}()
 
-    err = ctx.Run()
+    quit := make(chan os.Signal)
+    signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+    err = ctx.Run(quit)
     if (err != nil) {
         exit(err)
     }

@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/rpc"
@@ -70,7 +71,7 @@ func rpcHookAfter(info *rpc.RequestInfo) {
     span.End()
 }
 
-func (cmd *ServerCmd) Run() error {
+func (cmd *ServerCmd) Run(quit chan os.Signal) error {
     log.Info("Launching SubscribeD", "address", cmd.Address)
 
     // Create a new RPC server
@@ -98,8 +99,16 @@ func (cmd *ServerCmd) Run() error {
     r.Use(auth.Middleware)
     r.HandleFunc("/rpc", CorsHandler).Methods("OPTIONS")
     r.Handle("/rpc", s)
-    err = http.ListenAndServe(cmd.Address, r)
-    if (err != nil) {
+
+    server := &http.Server{Addr: cmd.Address, Handler: r}
+
+    go func() {
+        <-quit
+        server.Shutdown(context.Background())
+    }()
+
+    err = server.ListenAndServe()
+    if (err != nil && err != http.ErrServerClosed ) {
       log.Error("Failed to launch server", "error", err)
       return err
     }
