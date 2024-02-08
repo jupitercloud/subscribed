@@ -9,13 +9,56 @@ import (
 
 var log = logger.Named("auth");
 
+type Claims struct {
+    // Failure to parse claims
+    Error error
+    // The JWT *MUST* have a vendorId claim matching our vendor ID.
+    VendorId string `json:"https://jupitercloud.com/vendorId"`
+    // Account ID scope authorized for this token.
+    AccountId string `json:"https://jupitercloud.com/accountId"`
+}
+
 type authService struct {
     issuer string
+    vendorId string
     provider *oidc.Provider
+    verifier *oidc.IDTokenVerifier
+}
+
+type authError struct {
+    message string
+}
+
+func (err *authError) Error() string {
+    return err.message
+}
+
+func Unauthenticated() error {
+    return &authError{message: "Authorization requred"}
+}
+
+func (auth *authService) readToken(ctx context.Context, tokenString string) *Claims {
+    var claims Claims
+    token, err := auth.verifier.Verify(ctx, tokenString)
+    if err != nil {
+        claims.Error = err
+        return &claims
+    }
+    err = token.Claims(&claims)
+    if err != nil {
+        claims.Error = err
+        return &claims
+    }
+    if claims.VendorId != auth.vendorId {
+        err = &authError{message: "Invalid vendorId claim"}
+        claims.Error = err
+        return &claims
+    }
+    return &claims
 }
 
 func (auth *authService) Initialize(ctx context.Context) error {
-    log.Info("Initializing authorization service", "issuer", auth.issuer)
+    log.Info("Initializing authorization service", "issuer", auth.issuer, "vendor-id", auth.vendorId)
     provider, err := oidc.NewProvider(ctx, auth.issuer)
 
     if err != nil {
@@ -23,6 +66,8 @@ func (auth *authService) Initialize(ctx context.Context) error {
     }
 
     auth.provider = provider
+    // No client ID, as we are not executing a full OIDC handshake.
+    auth.verifier = provider.Verifier(&oidc.Config{SkipClientIDCheck: true})
     return nil
 }
 
@@ -32,12 +77,16 @@ func (auth *authService) Shutdown(ctx context.Context) error {
     return nil
 }
 
-func (amw *authService) Middleware(next http.Handler) http.Handler {
+func (auth *authService) Middleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-        next.ServeHTTP(response, request)
+        ctx := request.Context()
+        claims := auth.readToken(ctx, request.Header.Get("Authorization"))
+        ctx2 := context.WithValue(ctx, "claims", claims)
+        request2 := request.WithContext(ctx2)
+        next.ServeHTTP(response, request2)
     })
 }
 
-func NewAuthService(issuer string) *authService {
-    return &authService{issuer: issuer}
+func NewAuthService(issuer string, vendorId string) *authService {
+    return &authService{issuer: issuer, vendorId: vendorId}
 }

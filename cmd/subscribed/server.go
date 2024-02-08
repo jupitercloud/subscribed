@@ -83,7 +83,7 @@ func (cmd *ServerCmd) Run(quit chan os.Signal) error {
     s.RegisterInterceptFunc(rpcHookBefore)
     s.RegisterAfterFunc(rpcHookAfter)
 
-    auth := auth.NewAuthService(cmd.Issuer)
+    auth := auth.NewAuthService(cmd.Issuer, cmd.VendorId)
     err := auth.Initialize(context.Background())
     if (err != nil) {
         log.Error("Failed to initialize authorization")

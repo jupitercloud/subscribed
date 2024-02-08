@@ -19,8 +19,9 @@ type Globals struct {
 }
 
 type ServerCmd struct {
-    Address string `default:":8081"`
-    Issuer string `default:"https://login.poseidon.cloud"`
+    Address string `default:":8081" help:"Server bind address"`
+    Issuer string `default:"https://login.poseidon.cloud" help:"OIDC compatible token issuer URL"`
+    VendorId string `required:"" help:"Vendor ID for this instance"`
 }
 
 type CLI struct {
