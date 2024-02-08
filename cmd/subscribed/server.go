@@ -15,6 +15,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
+	"jupitercloud.com/subscribed/auth"
 	"jupitercloud.com/subscribed/service"
 )
 
@@ -81,15 +82,26 @@ func (cmd *ServerCmd) Run() error {
     s.RegisterInterceptFunc(rpcHookBefore)
     s.RegisterAfterFunc(rpcHookAfter)
 
+    auth := auth.NewAuthService(cmd.Issuer)
+    err := auth.Initialize(context.Background())
+    if (err != nil) {
+        log.Error("Failed to initialize authorization")
+        return err
+    }
+
+    defer auth.Shutdown(context.Background())
+
     r := mux.NewRouter()
     r.Use(otelmux.Middleware("subscribed"))
     r.Use(httpTraceMiddleware)
     r.Use(corsMiddleware)
+    r.Use(auth.Middleware)
     r.HandleFunc("/rpc", CorsHandler).Methods("OPTIONS")
     r.Handle("/rpc", s)
-    err := http.ListenAndServe(cmd.Address, r)
+    err = http.ListenAndServe(cmd.Address, r)
     if (err != nil) {
       log.Error("Failed to launch server", "error", err)
+      return err
     }
 
    	return nil

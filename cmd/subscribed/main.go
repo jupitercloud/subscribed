@@ -18,6 +18,7 @@ type Globals struct {
 
 type ServerCmd struct {
     Address string `default:":8081"`
+    Issuer string `default:"https://login.poseidon.cloud"`
 }
 
 type CLI struct {
