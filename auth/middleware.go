@@ -1,10 +1,12 @@
 package auth
 
 import (
-    "context"
+	"context"
 	"net/http"
-  	"github.com/coreos/go-oidc/v3/oidc"
-    "jupitercloud.com/subscribed/logger"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"jupitercloud.com/subscribed/errors"
+	"jupitercloud.com/subscribed/logger"
 )
 
 var log = logger.Named("auth");
@@ -25,33 +27,25 @@ type authService struct {
     verifier *oidc.IDTokenVerifier
 }
 
-type authError struct {
-    message string
-}
-
-func (err *authError) Error() string {
-    return err.message
-}
-
-func Unauthenticated() error {
-    return &authError{message: "Authorization requred"}
-}
 
 func (auth *authService) readToken(ctx context.Context, tokenString string) *Claims {
     var claims Claims
+    if (tokenString == "") {
+        claims.Error = errors.Unauthenticated()
+        return &claims
+    }
     token, err := auth.verifier.Verify(ctx, tokenString)
     if err != nil {
-        claims.Error = err
+        claims.Error = errors.JwtError(err)
         return &claims
     }
     err = token.Claims(&claims)
     if err != nil {
-        claims.Error = err
+        claims.Error = errors.JwtError(err)
         return &claims
     }
     if claims.VendorId != auth.vendorId {
-        err = &authError{message: "Invalid vendorId claim"}
-        claims.Error = err
+        claims.Error = errors.InvalidVendorIdClaim()
         return &claims
     }
     return &claims

@@ -5,6 +5,7 @@ import (
 
 	"jupitercloud.com/subscribed/api"
 	"jupitercloud.com/subscribed/auth"
+	"jupitercloud.com/subscribed/errors"
 	"jupitercloud.com/subscribed/logger"
 )
 
@@ -16,7 +17,7 @@ type SubscriptionService struct{}
 func verifyAuthorization (request *http.Request) (*auth.Claims, error) {
     var claims *auth.Claims = request.Context().Value("claims").(*auth.Claims)
     if claims == nil {
-        return nil, auth.Unauthenticated()
+        return nil, errors.Unauthenticated()
     }
     if claims.Error != nil {
         return nil, claims.Error
