@@ -36,6 +36,26 @@ func (t *SubscriptionService) HealthCheck(request *http.Request, args *api.Healt
     return nil
 }
 
+func (t *SubscriptionService) CreateAccount(request *http.Request, args *api.CreateAccountRequest, reply *api.CreateAccountResponse) error {
+    _, err := verifyAuthorization(request)
+    if err != nil {
+        return err
+    }
+    log.Debug("RPC CreateAccount")
+
+    return nil
+}
+
+func (t *SubscriptionService) TerminateAccount(request *http.Request, args *api.TerminateAccountRequest, reply *api.TerminateAccountResponse) error {
+    _, err := verifyAuthorization(request)
+    if err != nil {
+        return err
+    }
+    log.Debug("RPC TerminateAccount")
+
+    return nil
+}
+
 func (t *SubscriptionService) CreateSubscription(request *http.Request, args *api.CreateSubscriptionRequest, reply *api.CreateSubscriptionResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
