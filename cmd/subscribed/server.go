@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
+	"jupitercloud.com/subscribed/api"
 	"jupitercloud.com/subscribed/auth"
 	"jupitercloud.com/subscribed/service"
 )
@@ -71,13 +72,18 @@ func rpcHookAfter(info *rpc.RequestInfo) {
     span.End()
 }
 
+// Override this function with your vendor-specific implementation.
+func vendorSubscriptionService() api.SubscriptionServiceInterface {
+    return service.CreateSubscriptionServiceStub()
+}
+
 func (cmd *ServerCmd) Run(quit chan os.Signal) error {
     // Create a new RPC server
     s := rpc.NewServer()
     // Register the type of data requested as JSON
     s.RegisterCodec(json2.NewCodec(), "application/json")
     // Register the service by creating a new JSON server
-    s.RegisterService(new(service.SubscriptionService), "")
+    s.RegisterService(service.CreateSubscriptionService(vendorSubscriptionService()), "")
     s.RegisterInterceptFunc(rpcHookBefore)
     s.RegisterAfterFunc(rpcHookAfter)
 

@@ -1,5 +1,9 @@
 package api
 
+import (
+	"net/http"
+)
+
 type Metadata map[string]interface{}
 
 type Address struct {
@@ -131,4 +135,27 @@ type TerminateResourceRequest struct {
 
 type TerminateResourceResponse struct {
     // Empty
+}
+
+type SubscriptionServiceInterface interface {
+    // Probe the service for liveness.
+    HealthCheck(request *http.Request, args *HealthCheckRequest, reply *HealthCheckResponse) error
+
+    // Create a new customer account.
+    CreateAccount(request *http.Request, args *CreateAccountRequest, reply *CreateAccountResponse) error
+
+    // Close a customer account.
+    TerminateAccount(request *http.Request, args *TerminateAccountRequest, reply *TerminateAccountResponse) error
+
+    // Create a new subscription.
+    CreateSubscription(request *http.Request, args *CreateSubscriptionRequest, reply *CreateSubscriptionResponse) error
+
+    // Terminate an existing subscription.
+    TerminateSubscription(request *http.Request, args *TerminateSubscriptionRequest, reply *TerminateSubscriptionResponse) error
+
+    // Create a new resource in a subscription.
+    CreateResource(request *http.Request, args *CreateResourceRequest, reply *CreateResourceResponse) error
+
+    // Terminate a resource in a subscription.
+    TerminateResource(request *http.Request, args *TerminateResourceRequest, reply *TerminateResourceResponse) error
 }

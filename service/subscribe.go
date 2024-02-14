@@ -11,8 +11,10 @@ import (
 
 var log = logger.Named("SubscriptionService");
 
-type SubscriptionService struct{}
-
+// This SubscriptionService wrapper wraps an implementation with token verification and logging.
+type SubscriptionService struct{
+    impl api.SubscriptionServiceInterface
+}
 
 func verifyAuthorization (request *http.Request) (*auth.Claims, error) {
     var claims *auth.Claims = request.Context().Value("claims").(*auth.Claims)
@@ -25,73 +27,78 @@ func verifyAuthorization (request *http.Request) (*auth.Claims, error) {
     return claims, nil
 }
 
-func (t *SubscriptionService) HealthCheck(request *http.Request, args *api.HealthCheckRequest, reply *api.HealthCheckResponse) error {
+func (self *SubscriptionService) HealthCheck(request *http.Request, args *api.HealthCheckRequest, reply *api.HealthCheckResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
 
     log.Debug("RPC HealthCheck")
-    reply.Ok = true
-    return nil
+    return self.impl.HealthCheck(request, args, reply)
 }
 
-func (t *SubscriptionService) CreateAccount(request *http.Request, args *api.CreateAccountRequest, reply *api.CreateAccountResponse) error {
+func (self *SubscriptionService) CreateAccount(request *http.Request, args *api.CreateAccountRequest, reply *api.CreateAccountResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
+
     log.Debug("RPC CreateAccount")
-
-    return nil
+    return self.impl.CreateAccount(request, args, reply)
 }
 
-func (t *SubscriptionService) TerminateAccount(request *http.Request, args *api.TerminateAccountRequest, reply *api.TerminateAccountResponse) error {
+func (self *SubscriptionService) TerminateAccount(request *http.Request, args *api.TerminateAccountRequest, reply *api.TerminateAccountResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
+
     log.Debug("RPC TerminateAccount")
-
-    return nil
+    return self.impl.TerminateAccount(request, args, reply)
 }
 
-func (t *SubscriptionService) CreateSubscription(request *http.Request, args *api.CreateSubscriptionRequest, reply *api.CreateSubscriptionResponse) error {
+func (self *SubscriptionService) CreateSubscription(request *http.Request, args *api.CreateSubscriptionRequest, reply *api.CreateSubscriptionResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
+
     log.Debug("RPC CreateSubscription")
-
-    return nil
+    return self.impl.CreateSubscription(request, args, reply)
 }
 
-func (t *SubscriptionService) TerminateSubscription(request *http.Request, args *api.TerminateSubscriptionRequest, reply *api.TerminateSubscriptionResponse) error {
+func (self *SubscriptionService) TerminateSubscription(request *http.Request, args *api.TerminateSubscriptionRequest, reply *api.TerminateSubscriptionResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
+
     log.Debug("RPC TerminateSubscription")
-
-    return nil
+    return self.impl.TerminateSubscription(request, args, reply)
 }
 
-func (t *SubscriptionService) CreateResource(request *http.Request, args *api.CreateResourceRequest, reply *api.CreateResourceResponse) error {
+func (self *SubscriptionService) CreateResource(request *http.Request, args *api.CreateResourceRequest, reply *api.CreateResourceResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
+
     log.Debug("RPC CreateResource")
-
-    return nil
+    return self.impl.CreateResource(request, args, reply)
 }
 
-func (t *SubscriptionService) TerminateResource(request *http.Request, args *api.TerminateResourceRequest, reply *api.TerminateResourceResponse) error {
+func (self *SubscriptionService) TerminateResource(request *http.Request, args *api.TerminateResourceRequest, reply *api.TerminateResourceResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
-    log.Debug("RPC TerminateResource")
 
-    return nil
+    log.Debug("RPC TerminateResource")
+    return self.impl.TerminateResource(request, args, reply)
+}
+
+func CreateSubscriptionService(impl api.SubscriptionServiceInterface) *SubscriptionService {
+    return &SubscriptionService{
+      impl: impl,
+    }
 }
