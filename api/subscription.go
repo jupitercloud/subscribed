@@ -68,6 +68,8 @@ type TerminateSubscriptionRequest struct {
     AccountId string `json:"accountId"`
     // Subscription ID to terminate.
     SubscriptionId string `json:"subscriptionId"`
+    // SKU for the subscription.
+    Sku int64 `json:"sku"`
     // Vendor-defined data for the account.
     AccountData Metadata `json:"accountData"`
     // Vendor-defined data for the subscription.
@@ -85,7 +87,7 @@ type CreateResourceRequest struct {
     SubscriptionId string `json:"subscriptionId"`
     // Resource ID assigned.
     ResourceId string `json:"resourceId"`
-    // SKU linked to the subscription.
+    // SKU for the subscription.
     Sku int64 `json:"sku"`
     // Vendor-defined configuration for this SKU.
     Configuration Metadata `json:"configuration"`
@@ -117,6 +119,8 @@ type TerminateResourceRequest struct {
     SubscriptionId string `json:"subscriptionId"`
     // Resource ID to terminate.
     ResourceId string `json:"resourceId"`
+    // SKU for the subscription resource.
+    Sku int64 `json:"sku"`
     // Vendor-defined data for the account.
     AccountData Metadata `json:"accountData"`
     // Vendor-defined data for the subscription.
