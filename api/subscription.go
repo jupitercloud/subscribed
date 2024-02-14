@@ -1,7 +1,8 @@
 package api
 
 import (
-	"net/http"
+    "context"
+    "net/http"
 )
 
 type Metadata map[string]interface{}
@@ -137,7 +138,16 @@ type TerminateResourceResponse struct {
     // Empty
 }
 
+type Initializable interface {
+    // Perform resource initialization, such as establishing a database connection.
+    Initialize(ctx context.Context) error
+    // Close resources opened during initialization.
+    Shutdown(ctx context.Context) error
+}
+
 type SubscriptionServiceInterface interface {
+    Initializable
+
     // Probe the service for liveness.
     HealthCheck(request *http.Request, args *HealthCheckRequest, reply *HealthCheckResponse) error
 

@@ -78,12 +78,14 @@ func vendorSubscriptionService() api.SubscriptionServiceInterface {
 }
 
 func (cmd *ServerCmd) Run(quit chan os.Signal) error {
+    impl := vendorSubscriptionService()
+    svc := service.CreateSubscriptionService(impl)
     // Create a new RPC server
     s := rpc.NewServer()
     // Register the type of data requested as JSON
     s.RegisterCodec(json2.NewCodec(), "application/json")
     // Register the service by creating a new JSON server
-    s.RegisterService(service.CreateSubscriptionService(vendorSubscriptionService()), "")
+    s.RegisterService(svc, "")
     s.RegisterInterceptFunc(rpcHookBefore)
     s.RegisterAfterFunc(rpcHookAfter)
 
@@ -95,6 +97,14 @@ func (cmd *ServerCmd) Run(quit chan os.Signal) error {
     }
 
     defer auth.Shutdown(context.Background())
+
+    err = impl.Initialize(context.Background())
+    if (err != nil) {
+        log.Error("Failed to initialize service")
+        return err
+    }
+
+    defer impl.Shutdown(context.Background())
 
     r := mux.NewRouter()
     r.Use(otelmux.Middleware("subscribed"))

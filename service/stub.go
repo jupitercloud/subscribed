@@ -1,12 +1,21 @@
 package service
 
 import (
-	"net/http"
+    "context"
+    "net/http"
 
-	"jupitercloud.com/subscribed/api"
+    "jupitercloud.com/subscribed/api"
 )
 
 type SubscriptionServiceStub struct{}
+
+func (t *SubscriptionServiceStub) Initialize(ctx context.Context) error {
+    return nil
+}
+
+func (t *SubscriptionServiceStub) Shutdown(ctx context.Context) error {
+    return nil
+}
 
 func (t *SubscriptionServiceStub) HealthCheck(request *http.Request, args *api.HealthCheckRequest, reply *api.HealthCheckResponse) error {
     reply.Ok = true
