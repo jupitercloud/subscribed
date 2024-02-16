@@ -3,6 +3,8 @@ package service
 import (
 	"net/http"
 
+	"go.opentelemetry.io/otel/attribute"
+    "go.opentelemetry.io/otel/trace"
 	"jupitercloud.com/subscribed/api"
 	"jupitercloud.com/subscribed/auth"
 	"jupitercloud.com/subscribed/errors"
@@ -44,6 +46,12 @@ func (self *SubscriptionService) CreateAccount(request *http.Request, args *api.
     }
 
     log.Debug("RPC CreateAccount")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("account.account_id", args.AccountId),
+    )
+
     return self.impl.CreateAccount(request, args, reply)
 }
 
@@ -54,6 +62,12 @@ func (self *SubscriptionService) TerminateAccount(request *http.Request, args *a
     }
 
     log.Debug("RPC TerminateAccount")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("account.account_id", args.AccountId),
+    )
+
     return self.impl.TerminateAccount(request, args, reply)
 }
 
@@ -64,6 +78,14 @@ func (self *SubscriptionService) CreateSubscription(request *http.Request, args 
     }
 
     log.Debug("RPC CreateSubscription")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("subscription.account_id", args.AccountId),
+        attribute.String("subscription.subscription_id", args.SubscriptionId),
+        attribute.Int64("subscription.sku", args.Sku),
+    )
+
     return self.impl.CreateSubscription(request, args, reply)
 }
 
@@ -74,6 +96,14 @@ func (self *SubscriptionService) TerminateSubscription(request *http.Request, ar
     }
 
     log.Debug("RPC TerminateSubscription")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("subscription.account_id", args.AccountId),
+        attribute.String("subscription.subscription_id", args.SubscriptionId),
+        attribute.Int64("subscription.sku", args.Sku),
+    )
+
     return self.impl.TerminateSubscription(request, args, reply)
 }
 
@@ -84,6 +114,15 @@ func (self *SubscriptionService) CreateResource(request *http.Request, args *api
     }
 
     log.Debug("RPC CreateResource")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("resource.account_id", args.AccountId),
+        attribute.String("resource.subscription_id", args.SubscriptionId),
+        attribute.String("resource.resource_id", args.ResourceId),
+        attribute.Int64("resource.sku", args.Sku),
+    )
+
     return self.impl.CreateResource(request, args, reply)
 }
 
@@ -94,6 +133,15 @@ func (self *SubscriptionService) TerminateResource(request *http.Request, args *
     }
 
     log.Debug("RPC TerminateResource")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("resource.account_id", args.AccountId),
+        attribute.String("resource.subscription_id", args.SubscriptionId),
+        attribute.String("resource.resource_id", args.ResourceId),
+        attribute.Int64("resource.sku", args.Sku),
+    )
+
     return self.impl.TerminateResource(request, args, reply)
 }
 
