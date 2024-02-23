@@ -7,6 +7,14 @@ import (
 
 type Metadata map[string]interface{}
 
+type RichText struct {
+    // Format of this instruction content.
+    // Valid values: "plain", "markdown"
+    Format string `json:"format"`
+    // Encoded content
+    Content string `json:"content"`
+}
+
 type Address struct {
     // Unique ID for this address
     AddressId string `json:"addressId"`
@@ -63,9 +71,13 @@ type CreateSubscriptionRequest struct {
 }
 
 type CreateSubscriptionResponse struct {
-    // Optional vendor-defined data. You may use this field to return ID's or tokens mapping this
+    // Vendor-defined data. You may use this field to return ID's or tokens mapping this
     // subscription to your internal application identifiers.
     SubscriptionData Metadata `json:"subscriptionData"`
+    // URL to access this subscription.
+    Url string `json:"url"`
+    // Human readable instructions to access this subscription.
+    Instructions RichText `json:"instructions"`
 }
 
 type TerminateSubscriptionRequest struct {
@@ -102,19 +114,13 @@ type CreateResourceRequest struct {
     SubscriptionData Metadata `json:"subscriptionData"`
 }
 
-type ResourceInstructions struct {
-    // Format of this instruction content.
-    // Valid values: "plain", "markdown"
-    Format string `json:"format"`
-    // Encoded content
-    Content string `json:"content"`
-}
-
 type CreateResourceResponse struct {
+    // URL to access this resource
+    Url string `json:"url"`
     // Vendor-defined data associated with this resource.
     ResourceData Metadata `json:"resourceData"`
     // Human readable instructions to access this resource.
-    Instructions ResourceInstructions `json:"instructions"`
+    Instructions RichText `json:"instructions"`
 }
 
 type TerminateResourceRequest struct {
