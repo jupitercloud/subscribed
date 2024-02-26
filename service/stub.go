@@ -22,11 +22,11 @@ func (t *SubscriptionServiceStub) HealthCheck(request *http.Request, args *api.H
     return nil
 }
 
-func (t *SubscriptionServiceStub) CreateAccount(request *http.Request, args *api.CreateAccountRequest, reply *api.CreateAccountResponse) error {
+func (t *SubscriptionServiceStub) OpenAccount(request *http.Request, args *api.OpenAccountRequest, reply *api.OpenAccountResponse) error {
     return nil
 }
 
-func (t *SubscriptionServiceStub) TerminateAccount(request *http.Request, args *api.TerminateAccountRequest, reply *api.TerminateAccountResponse) error {
+func (t *SubscriptionServiceStub) CloseAccount(request *http.Request, args *api.CloseAccountRequest, reply *api.CloseAccountResponse) error {
     return nil
 }
 

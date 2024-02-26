@@ -34,7 +34,7 @@ type Address struct {
     PostalCode string `json:"postalCode"`
 }
 
-type CreateAccountRequest struct {
+type OpenAccountRequest struct {
     // Account ID to create
     AccountId string `json:"accountId"`
     // Account name
@@ -43,19 +43,19 @@ type CreateAccountRequest struct {
     Addresses []Address `json:"addresses"`
 }
 
-type CreateAccountResponse struct {
+type OpenAccountResponse struct {
     // Optional vendor-defined data to attach to the account.
     AccountData Metadata `json:"accountData"`
 }
 
-type TerminateAccountRequest struct {
+type CloseAccountRequest struct {
     // Account ID to terminate.
     AccountId string `json:"accountId"`
     // Vendor-defined data associated with this account.
     AccountData Metadata `json:"accountData"`
 }
 
-type TerminateAccountResponse struct {
+type CloseAccountResponse struct {
     // Empty
 }
 
@@ -157,11 +157,11 @@ type SubscriptionServiceInterface interface {
     // Probe the service for liveness.
     HealthCheck(request *http.Request, args *HealthCheckRequest, reply *HealthCheckResponse) error
 
-    // Create a new customer account.
-    CreateAccount(request *http.Request, args *CreateAccountRequest, reply *CreateAccountResponse) error
+    // Create (or reopen) a customer account.
+    OpenAccount(request *http.Request, args *OpenAccountRequest, reply *OpenAccountResponse) error
 
     // Close a customer account.
-    TerminateAccount(request *http.Request, args *TerminateAccountRequest, reply *TerminateAccountResponse) error
+    CloseAccount(request *http.Request, args *CloseAccountRequest, reply *CloseAccountResponse) error
 
     // Create a new subscription.
     CreateSubscription(request *http.Request, args *CreateSubscriptionRequest, reply *CreateSubscriptionResponse) error

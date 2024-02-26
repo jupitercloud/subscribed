@@ -39,36 +39,36 @@ func (self *SubscriptionService) HealthCheck(request *http.Request, args *api.He
     return self.impl.HealthCheck(request, args, reply)
 }
 
-func (self *SubscriptionService) CreateAccount(request *http.Request, args *api.CreateAccountRequest, reply *api.CreateAccountResponse) error {
+func (self *SubscriptionService) OpenAccount(request *http.Request, args *api.OpenAccountRequest, reply *api.OpenAccountResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
 
-    log.Debug("RPC CreateAccount")
+    log.Debug("RPC OpenAccount")
 
     span := trace.SpanFromContext(request.Context())
     span.SetAttributes(
         attribute.String("account.account_id", args.AccountId),
     )
 
-    return self.impl.CreateAccount(request, args, reply)
+    return self.impl.OpenAccount(request, args, reply)
 }
 
-func (self *SubscriptionService) TerminateAccount(request *http.Request, args *api.TerminateAccountRequest, reply *api.TerminateAccountResponse) error {
+func (self *SubscriptionService) CloseAccount(request *http.Request, args *api.CloseAccountRequest, reply *api.CloseAccountResponse) error {
     _, err := verifyAuthorization(request)
     if err != nil {
         return err
     }
 
-    log.Debug("RPC TerminateAccount")
+    log.Debug("RPC CloseAccount")
 
     span := trace.SpanFromContext(request.Context())
     span.SetAttributes(
         attribute.String("account.account_id", args.AccountId),
     )
 
-    return self.impl.TerminateAccount(request, args, reply)
+    return self.impl.CloseAccount(request, args, reply)
 }
 
 func (self *SubscriptionService) CreateSubscription(request *http.Request, args *api.CreateSubscriptionRequest, reply *api.CreateSubscriptionResponse) error {
