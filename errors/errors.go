@@ -27,3 +27,10 @@ func JwtError(cause error) *json2.Error {
         },
     }
 }
+
+func InvalidArgumentError(reason string) *json2.Error {
+  return &json2.Error{
+        Code: -1004,
+        Message: "Invalid argument: " + reason,
+  }
+}
