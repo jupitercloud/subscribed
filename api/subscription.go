@@ -106,6 +106,8 @@ type CreateResourceRequest struct {
     ResourceId string `json:"resourceId"`
     // SKU for the subscription.
     Sku int64 `json:"sku"`
+    // Resource name assigned by the user.
+    ResourceName string `json:"resourceName"`
     // Vendor-defined configuration for this SKU.
     Configuration Metadata `json:"configuration"`
     // Vendor-defined data for the account.
@@ -132,6 +134,8 @@ type TerminateResourceRequest struct {
     ResourceId string `json:"resourceId"`
     // SKU for the subscription resource.
     Sku int64 `json:"sku"`
+    // Resource name assigned by the user.
+    ResourceName string `json:"resourceName"`
     // Vendor-defined data for the account.
     AccountData Metadata `json:"accountData"`
     // Vendor-defined data for the subscription.
