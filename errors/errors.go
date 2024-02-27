@@ -34,3 +34,13 @@ func InvalidArgumentError(reason string) *json2.Error {
         Message: "Invalid argument: " + reason,
   }
 }
+
+func UnsupportedSkuError(sku int64) *json2.Error {
+  return &json2.Error{
+        Code: -1005,
+        Message: "Unsupported SKU",
+        Data: map[string]interface{}{
+            "sku": sku,
+        },
+  }
+}
