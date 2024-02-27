@@ -1,8 +1,9 @@
 package api
 
 import (
-    "context"
-    "net/http"
+	"context"
+	"encoding/json"
+	"net/http"
 )
 
 type Metadata map[string]interface{}
@@ -109,7 +110,7 @@ type CreateResourceRequest struct {
     // Resource name assigned by the user.
     ResourceName string `json:"resourceName"`
     // Vendor-defined configuration for this SKU.
-    Configuration Metadata `json:"configuration"`
+    Configuration json.RawMessage `json:"configuration"`
     // Vendor-defined data for the account.
     AccountData Metadata `json:"accountData"`
     // Vendor-defined data for the subscription.
