@@ -1,14 +1,14 @@
 package service
 
 import (
-	"net/http"
+    "net/http"
 
-	"go.opentelemetry.io/otel/attribute"
+    "go.opentelemetry.io/otel/attribute"
     "go.opentelemetry.io/otel/trace"
-	"jupitercloud.com/subscribed/api"
-	"jupitercloud.com/subscribed/auth"
-	"jupitercloud.com/subscribed/errors"
-	"jupitercloud.com/subscribed/logger"
+    "github.com/jupitercloud/subscribed/api"
+    "github.com/jupitercloud/subscribed/auth"
+    "github.com/jupitercloud/subscribed/errors"
+    "github.com/jupitercloud/subscribed/logger"
 )
 
 var log = logger.Named("SubscriptionService");

@@ -1,4 +1,4 @@
-module jupitercloud.com/subscribed
+module github.com/jupitercloud/subscribed
 
 go 1.21
 

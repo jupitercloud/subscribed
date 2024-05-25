@@ -4,21 +4,21 @@
 package main
 
 import (
-	"context"
-	"net/http"
-	"os"
+    "context"
+    "net/http"
+    "os"
 
-	"github.com/gorilla/mux"
-	rpc "github.com/gorilla/rpc/v2"
-	"github.com/gorilla/rpc/v2/json2"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
-	"jupitercloud.com/subscribed/api"
-	"jupitercloud.com/subscribed/auth"
-	"jupitercloud.com/subscribed/service"
+    "github.com/gorilla/mux"
+    rpc "github.com/gorilla/rpc/v2"
+    "github.com/gorilla/rpc/v2/json2"
+    "go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+    "go.opentelemetry.io/otel"
+    "go.opentelemetry.io/otel/attribute"
+    "go.opentelemetry.io/otel/codes"
+    "go.opentelemetry.io/otel/trace"
+    "github.com/jupitercloud/subscribed/api"
+    "github.com/jupitercloud/subscribed/auth"
+    "github.com/jupitercloud/subscribed/service"
 )
 
 var tracer = otel.Tracer("server")

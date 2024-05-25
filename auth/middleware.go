@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"context"
-	"encoding/json"
-	"net/http"
+    "context"
+    "encoding/json"
+    "net/http"
 
-	"github.com/coreos/go-oidc/v3/oidc"
-	"jupitercloud.com/subscribed/errors"
-	"jupitercloud.com/subscribed/logger"
+    "github.com/coreos/go-oidc/v3/oidc"
+    "github.com/jupitercloud/subscribed/errors"
+    "github.com/jupitercloud/subscribed/logger"
 )
 
 var log = logger.Named("auth");

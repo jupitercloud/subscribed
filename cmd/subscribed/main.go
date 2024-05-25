@@ -1,14 +1,14 @@
 package main
 
 import (
-	"context"
-	"os"
-	"os/signal"
-	"syscall"
+    "context"
+    "os"
+    "os/signal"
+    "syscall"
 
-	"github.com/alecthomas/kong"
-	"jupitercloud.com/subscribed/logger"
-	"jupitercloud.com/subscribed/telemetry"
+    "github.com/alecthomas/kong"
+    "github.com/jupitercloud/subscribed/logger"
+    "github.com/jupitercloud/subscribed/telemetry"
 )
 
 var log = logger.Named("main");
@@ -47,14 +47,14 @@ func main() {
     ctx := kong.Parse(&cli)
     logger.Initialize(cli.Globals.LogLevel)
    	// Set up OpenTelemetry.
-	shutdownTelemetry, err := telemetry.Initialize(context.Background(), telemetry.ExportModeFromString(cli.Globals.Telemetry))
-	if err != nil {
-		exit(err)
-	}
-    // Shutdown telemetry on exit.
-	defer func() {
-        shutdownTelemetry(context.Background())
-	}()
+  	shutdownTelemetry, err := telemetry.Initialize(context.Background(), telemetry.ExportModeFromString(cli.Globals.Telemetry))
+    if err != nil {
+      exit(err)
+    }
+      // Shutdown telemetry on exit.
+    defer func() {
+          shutdownTelemetry(context.Background())
+    }()
 
     quit := make(chan os.Signal)
     signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

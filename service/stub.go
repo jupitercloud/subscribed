@@ -4,7 +4,7 @@ import (
     "context"
     "net/http"
 
-    "jupitercloud.com/subscribed/api"
+    "github.com/jupitercloud/subscribed/api"
 )
 
 type SubscriptionServiceStub struct{}

@@ -12,7 +12,7 @@ import (
     "go.opentelemetry.io/otel/propagation"
     "go.opentelemetry.io/otel/sdk/metric"
     "go.opentelemetry.io/otel/sdk/trace"
-    "jupitercloud.com/subscribed/logger"
+    "github.com/jupitercloud/subscribed/logger"
 )
 
 var log = logger.Named("telemetry");
