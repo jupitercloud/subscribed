@@ -145,7 +145,7 @@ func (self *SubscriptionService) TerminateResource(request *http.Request, args *
     return self.impl.TerminateResource(request, args, reply)
 }
 
-func CreateSubscriptionService(impl api.SubscriptionServiceInterface) *SubscriptionService {
+func createSubscriptionService(impl api.SubscriptionServiceInterface) *SubscriptionService {
     return &SubscriptionService{
       impl: impl,
     }
