@@ -46,6 +46,10 @@ func (t *SubscriptionServiceStub) TerminateResource(request *http.Request, args 
     return nil
 }
 
+func (t *SubscriptionServiceStub) GetSubscriptionUsage(request *http.Request, args *api.GetSubscriptionUsageRequest, reply *api.GetSubscriptionUsageResponse) error {
+    return nil
+}
+
 func CreateSubscriptionServiceStub() api.SubscriptionServiceInterface {
   return &SubscriptionServiceStub{}
 }

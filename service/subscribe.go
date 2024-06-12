@@ -145,6 +145,23 @@ func (self *SubscriptionService) TerminateResource(request *http.Request, args *
     return self.impl.TerminateResource(request, args, reply)
 }
 
+func (self *SubscriptionService) GetSubscriptionUsage(request *http.Request, args *api.GetSubscriptionUsageRequest, reply *api.GetSubscriptionUsageResponse) error {
+    _, err := verifyAuthorization(request)
+    if err != nil {
+        return err
+    }
+
+    log.Debug("RPC GetSubscriptionUsage")
+
+    span := trace.SpanFromContext(request.Context())
+    span.SetAttributes(
+        attribute.String("resource.account_id", args.AccountId),
+        attribute.String("resource.subscription_id", args.SubscriptionId),
+    )
+
+    return self.impl.GetSubscriptionUsage(request, args, reply)
+}
+
 func createSubscriptionService(impl api.SubscriptionServiceInterface) *SubscriptionService {
     return &SubscriptionService{
       impl: impl,

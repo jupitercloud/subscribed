@@ -6,8 +6,6 @@ import (
     "net/http"
 )
 
-type Metadata map[string]interface{}
-
 type RichText struct {
     // Format of this instruction content.
     // Valid values: "plain", "markdown"
@@ -179,4 +177,8 @@ type SubscriptionServiceInterface interface {
 
     // Terminate a resource in a subscription.
     TerminateResource(request *http.Request, args *TerminateResourceRequest, reply *TerminateResourceResponse) error
+
+    // Query billable usage for a subscription
+    GetSubscriptionUsage(request *http.Request, args *GetSubscriptionUsageRequest, reply *GetSubscriptionUsageResponse) error
+
 }
